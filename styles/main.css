@@ -19,18 +19,21 @@
   border-radius: 3px;
   display: flex;
 }
-.game__info {
+.game-info {
   display: flex;
   flex-direction: column;
   margin-right: 5px;
 }
-.game__info--image {
+.main-image {
+  width: 120px;
+  height: 150px;
+  flex-shrink: 0;
   padding: 5px;
   border: 1px solid gray;
   width: 120px;
   margin-bottom: 5px;
 }
-.game__control {
+.game-control {
   display: grid;
   grid-template-columns: 33.33333% 33.33333% 33.33333%;
   grid-template-rows: 20% 20% 20% 20% 20%;
@@ -38,12 +41,12 @@
   position: relative;
   overflow: hidden;
 }
-.game__control .point {
+.game-control .point {
   width: var(--point-width);
   height: var(--point-height);
   overflow: hidden;
 }
-.game__control .point:before {
+.game-control .point:before {
   content: "";
   width: 100%;
   height: 100%;
@@ -52,7 +55,7 @@
   background-position: var(--point-before-top) var(--point-before-left);
   background-size: 100% 100%;
 }
-.game__control .point.empty:after {
+.game-control .point.empty:after {
   content: "";
   z-index: 1;
   width: var(--point-width);
@@ -63,9 +66,14 @@
   background-size: 100% 100%;
 }
 .list-sub-image {
+  bottom: 0;
   display: grid;
   grid-template-columns: 33.33% 33.33% 33.33%;
   row-gap: 10px;
+  width: 100%;
+}
+.restart-btn {
+  margin-top: 5px;
 }
 .sub-image {
   width: 30px;

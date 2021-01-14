@@ -6,24 +6,28 @@
   </head>
   <body>
     <div class="game no-select">
-      <div class="game__info">
-        <img src="image.png" class="game__info--image"/>
-        <button class="game__info--start-btn">Start</button>
-        <!-- <button class="game__info--restart-btn">Restart</button> -->
-        <br>
-        Time:
-        <p class="game__info--score">00:00:00</p>
+      <div class="game-info">
+        <img src="image.png" class="main-image" />
+        <button class="start-btn">Start</button>
+        <button class="restart-btn">Restart</button>
+        <p>Time: <span class="score-label">00:00:00</span></p>
         <div class="list-sub-image">
-          <img src="images/yasuo.jpg" class="sub-image">
-          <img src="images/yasuo1.jpg" class="sub-image">
-          <img src="images/yone.png" class="sub-image">
-          <img src="images/akali.png" class="sub-image">
-          <img src="images/supergirl.jpg" class="sub-image">
-          <img src="images/quynhnga.jpg" class="sub-image">
+          <img src="images/yasuo.jpg" class="sub-image" />
+          <img src="images/yasuo1.jpg" class="sub-image" />
+          <img src="images/yone.png" class="sub-image" />
+          <img src="images/akali.png" class="sub-image" />
+          <img src="images/supergirl.jpg" class="sub-image" />
+          <img src="images/quynhnga.jpg" class="sub-image" />
         </div>
       </div>
-      <div class="game__control"></div>
+      <div class="game-control"></div>
     </div>
+    <audio hidden id="audio_one">
+      <source src="sounds/click.ogg" type="audio/ogg" />
+    </audio>
+    <audio hidden id="audio_uplevel">
+      <source src="sounds/end.ogg" type="audio/ogg" />
+    </audio>
     <br />
     <script src="libs/jquery.min.js"></script>
     <script src="libs/lodash.min.js"></script>

@@ -1,20 +1,58 @@
 function TouchTouch() {
-  var gameClass = "game";
-  var startBtnClass = "game__info--start-btn";
+  var startBtnClass = "start-btn";
+  var restartBtnClass = "restart-btn";
   var subImageClass = "sub-image";
   var urlImage = "images/quynhnga.jpg";
   var maxHeight = 500;
+  var isPlaying = false;
   const gameConfig = {
-    h: 3,
-    v: 4,
+    h: 5,
+    v: 6,
     timeOut: 30,
   };
-  var isPlaying = false;
+
   var gameControlObj = new GameControl();
   var boardObj = new Board();
+  var timerObj = new Timer();
+  var audioClick = document.getElementById("audio_one");
+  var audioEnd = document.getElementById("audio_uplevel");
+
+  function Timer() {
+    this.elementClass = "score-label";
+    this.intervalTime;
+    this.seconds = 0;
+
+    this.start = () => {
+      this.intervalTime = setInterval(() => {
+        this.seconds += 1;
+        this.update();
+      }, 1000);
+    };
+    this.stop = () => {
+      clearInterval(this.intervalTime);
+    };
+    this.reset = () => {
+      this.seconds = 0;
+      clearInterval(this.intervalTime);
+      this.update();
+    };
+    this.restore = () => {
+      this.seconds = 0;
+      clearInterval(this.intervalTime);
+    };
+    this.prefix = (num) => {
+      return num < 10 ? `0${num}` : num;
+    };
+    this.update = () => {
+      const secs = this.prefix(this.seconds % 60);
+      const mins = this.prefix(Math.floor(this.seconds / 60) % 60);
+      const hours = this.prefix(Math.floor(this.seconds / 60 / 60) % 24);
+      jQuery(`.${this.elementClass}`).html(`${hours}:${mins}:${secs}`);
+    };
+  }
 
   function Board() {
-    this.boardClass = "game__control";
+    this.boardClass = "game-control";
     this.boardElement = jQuery(`.${this.boardClass}`);
     this.pointClass = "point";
     this.boardVal = [];
@@ -50,7 +88,7 @@ function TouchTouch() {
       );
     };
     this.updateBoard = () => {
-      jQuery(`.game__info--image`).attr("src", `${urlImage}`);
+      jQuery(`.main-image`).attr("src", `${urlImage}`);
       jQuery(`.${this.pointClass}.empty`).removeClass("empty");
       for (var i = 0; i < gameConfig.v; i++) {
         for (var j = 0; j < gameConfig.h; j++) {
@@ -85,7 +123,6 @@ function TouchTouch() {
         const { x: x0, y: y0 } = findArray2D(tempNewObject, 0);
         const randomNum = _.random(0, 3);
         const [randomX, randomY] = this.aroundPoint[randomNum];
-
         const newX = x0 + randomX;
         const newY = y0 + randomY;
         if (
@@ -93,8 +130,9 @@ function TouchTouch() {
           newX >= gameConfig.h ||
           newY < 0 ||
           newY >= gameConfig.v
-        )
+        ) {
           continue;
+        }
         const temp = tempNewObject[newY][newX];
         _.set(tempNewObject, `[${y0}][${x0}]`, temp);
         _.set(tempNewObject, `[${newY}][${newX}]`, 0);
@@ -103,9 +141,9 @@ function TouchTouch() {
       this.boardVal = newObject;
       this.updateBoard;
     };
-    // update cell class
-    this.setStylePoint = () => {};
-    this.restore = () => {};
+    this.reset = () => {
+      this.init();
+    };
   }
 
   function GameControl() {
@@ -124,12 +162,6 @@ function TouchTouch() {
       this.correctBoardVal = _.range(gameConfig.v * gameConfig.h);
       this.correctBoardVal = make2DArray(this.correctBoardVal, gameConfig.h);
     };
-    this.initEvent = () => {
-      jQuery("body").on("click", `.${boardObj.pointClass}`, this.clickSwap);
-      jQuery("body").on("click", `.${startBtnClass}`, this.clickButtonStart);
-      jQuery("body").on("click", `.${subImageClass}`, this.clickSwitchImage);
-    };
-    this.restore = function () {};
     // ---------------------
     // GAME CONTROL
     this.clickSwap = (e) => {
@@ -145,11 +177,9 @@ function TouchTouch() {
       _.set(newObject, `[${y}][${x}]`, 0);
       boardObj.boardVal = newObject;
       boardObj.updateBoard();
+      this.enableAudio(audioClick)
       this.checkEndGame();
     };
-    // ---------------------
-    // GAME CONTROL
-    this.enableAudio = function (audio) {};
     this.clickSwitchImage = (e) => {
       var url = jQuery(e.target).attr("src");
       urlImage = url;
@@ -157,6 +187,7 @@ function TouchTouch() {
       this.checkSelectedImage();
     };
     this.checkSelectedImage = (e) => {
+      this.handleRestartGame();
       jQuery(`.${subImageClass}`).removeClass("selected");
       jQuery(`.${subImageClass}`).each(function (e) {
         if (jQuery(this).attr("src") === urlImage) {
@@ -166,9 +197,16 @@ function TouchTouch() {
     };
     // ---------------------
     // GAME EVENT
+    this.initEvent = () => {
+      jQuery("body").on("click", `.${boardObj.pointClass}`, this.clickSwap);
+      jQuery("body").on("click", `.${startBtnClass}`, this.clickButtonStart);
+      jQuery("body").on("click", `.${restartBtnClass}`, this.handleRestartGame);
+      jQuery("body").on("click", `.${subImageClass}`, this.clickSwitchImage);
+    };
     this.restore = () => {
       jQuery("body").off("click", `.${boardObj.pointClass}`, this.clickSwap);
       jQuery("body").off("click", `.${startBtnClass}`, this.clickButtonStart);
+      jQuery("body").off("click", `.${restartBtnClass}`, this.handleRestartGame);
       jQuery("body").off("click", `.${subImageClass}`, this.clickSwitchImage);
     };
     // ---------------------
@@ -176,21 +214,41 @@ function TouchTouch() {
     this.checkEndGame = () => {
       if (_.isEqual(boardObj.boardVal, this.correctBoardVal)) {
         alert("You win!");
-        this.handleRestartGame();
-        isPlaying = false;
+        this.handleEndGame();
       }
     };
-    this.isEndGameCannotPlay = (e) => {
-      if (isEndGame) throw "Cannot play game!";
+    this.handleEndGame = () => {
+      isPlaying = false;
+      this.enableAudio(audioEnd)
+      this.setTitleStartButton(true);
+      timerObj.stop();
     };
-    this.handleEndGame = () => {};
     this.handleStartGame = (e) => {};
-    this.handleRestartGame = (e) => {};
-    this.clickButtonStart = () => {
-      isPlaying = true;
+    this.handleRestartGame = (e) => {
+      isPlaying = false;
+      this.setTitleStartButton();
+      boardObj.reset();
+      timerObj.reset();
     };
+    this.clickButtonStart = () => {
+      if (isPlaying) return;
+      isPlaying = true;
+      this.setTitleStartButton();
+      timerObj.start();
+    };
+    this.setTitleStartButton = (isEnd = false) => {
+      jQuery(`.${startBtnClass}`).html(
+        isEnd ? "You win!" : isPlaying ? "...Playing..." : "Start"
+      );
+      jQuery(`.${startBtnClass}`).prop("disabled", isEnd ? true : isPlaying);
+    };
+    this.restore = function () {};
     // ---------------------
     // AUDIO
+    this.enableAudio = function (audio) {
+      audio.currentTime = 0;
+      audio.play();
+    };
   }
 
   return {
