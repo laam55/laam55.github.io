@@ -4,7 +4,6 @@
   --point-before-top: 100px;
   --point-before-left: 100px;
 }
-
 .no-select {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -14,6 +13,9 @@
 }
 body {
   background-color: #282c34;
+}
+button {
+  cursor: pointer;
 }
 .game {
   background-color: white;
