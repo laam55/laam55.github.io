@@ -1,58 +1,31 @@
-function make2DArray(arr, w = 3) {
-  const newArr = [];
-  while (arr.length) {
-    newArr.push(arr.splice(0, w));
-  }
-  return newArr;
-}
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array.slice();
-}
-
-function findArray2D(array, findNum) {
-  let x = 0,
-    y = 0;
-  for (let i = 0; i < array.length; i++) {
-    y = i;
-    if (array[i].includes(findNum)) {
-      x = array[i].indexOf(findNum);
-      break;
-    }
-  }
-
-  return { x, y };
-}
-
 function TouchTouch() {
   var gameClass = "game";
   var startBtnClass = "game__info--start-btn";
+  var subImageClass = "sub-image";
+  var urlImage = "images/quynhnga.jpg";
+  var maxHeight = 500;
   const gameConfig = {
     h: 3,
-    v: 5,
+    v: 4,
     timeOut: 30,
   };
-  var isPlaying = false
-  // game object
+  var isPlaying = false;
   var gameControlObj = new GameControl();
   var boardObj = new Board();
 
   function Board() {
-    // boardElement
     this.boardClass = "game__control";
     this.boardElement = jQuery(`.${this.boardClass}`);
     this.pointClass = "point";
     this.boardVal = [];
-    // property
     this.aroundPoint = [
       [0, -1],
       [1, 0],
       [0, 1],
       [-1, 0],
     ];
+    var unitPx = maxHeight / gameConfig.v;
+
     this.init = () => {
       this.initBoard();
       this.randomBoard();
@@ -66,10 +39,18 @@ function TouchTouch() {
           jQuery(this.boardElement).append(html);
         }
       }
-      this.boardVal = make2DArray(_.range(gameConfig.v * gameConfig.h), gameConfig.h);
+      jQuery(this.boardElement).css({
+        width: `${gameConfig.h * unitPx}px`,
+        "grid-template-columns": `${100 / gameConfig.h}%`.repeat(gameConfig.h),
+        "grid-template-rows": `${100 / gameConfig.v}%`.repeat(gameConfig.v),
+      });
+      this.boardVal = make2DArray(
+        _.range(gameConfig.v * gameConfig.h),
+        gameConfig.h
+      );
     };
-    // mount cell
     this.updateBoard = () => {
+      jQuery(`.game__info--image`).attr("src", `${urlImage}`);
       jQuery(`.${this.pointClass}.empty`).removeClass("empty");
       for (var i = 0; i < gameConfig.v; i++) {
         for (var j = 0; j < gameConfig.h; j++) {
@@ -85,7 +66,14 @@ function TouchTouch() {
           jQuery(this.boardElement)
             .children()
             .eq(i * gameConfig.h + j)
-            .attr("style", `--top: -${x * 100}px; --left: -${y * 100}px`)
+            .attr(
+              "style",
+              `--point-width: ${unitPx}px;
+              --point-height: ${unitPx}px;
+              --point-before-top: -${x * unitPx}px;
+              --point-before-left: -${y * unitPx}px;
+              --image-url: url(../${urlImage})`
+            )
             .attr("value", JSON.stringify({ x: j, y: i, point }));
         }
       }
@@ -93,7 +81,7 @@ function TouchTouch() {
     this.randomBoard = () => {
       let newObject = _.cloneDeep(this.boardVal);
       for (i = 0; i < 1000; i++) {
-        const tempNewObject = _.cloneDeep(newObject)
+        const tempNewObject = _.cloneDeep(newObject);
         const { x: x0, y: y0 } = findArray2D(tempNewObject, 0);
         const randomNum = _.random(0, 3);
         const [randomX, randomY] = this.aroundPoint[randomNum];
@@ -108,9 +96,9 @@ function TouchTouch() {
         )
           continue;
         const temp = tempNewObject[newY][newX];
-        _.set(tempNewObject, `[${y0}][${x0}]`, temp)
-        _.set(tempNewObject, `[${newY}][${newX}]`, 0)
-        newObject = _.cloneDeep(tempNewObject)
+        _.set(tempNewObject, `[${y0}][${x0}]`, temp);
+        _.set(tempNewObject, `[${newY}][${newX}]`, 0);
+        newObject = _.cloneDeep(tempNewObject);
       }
       this.boardVal = newObject;
       this.updateBoard;
@@ -121,7 +109,6 @@ function TouchTouch() {
   }
 
   function GameControl() {
-    this.btnRestart = jQuery(".restart");
     // property
     this.correctBoardVal = [];
 
@@ -131,25 +118,23 @@ function TouchTouch() {
       this.initScreen();
       this.initEvent();
       boardObj.init();
+      this.checkSelectedImage();
     };
-
-    // init config
     this.initScreen = () => {
       this.correctBoardVal = _.range(gameConfig.v * gameConfig.h);
       this.correctBoardVal = make2DArray(this.correctBoardVal, gameConfig.h);
     };
-    // init event
     this.initEvent = () => {
-      $("body").on("click", `.${boardObj.pointClass}`, this.clickSwap);
-      $("body").on("click", `.${startBtnClass}`, this.clickButtonStart);
+      jQuery("body").on("click", `.${boardObj.pointClass}`, this.clickSwap);
+      jQuery("body").on("click", `.${startBtnClass}`, this.clickButtonStart);
+      jQuery("body").on("click", `.${subImageClass}`, this.clickSwitchImage);
     };
     this.restore = function () {};
     // ---------------------
     // GAME CONTROL
     this.clickSwap = (e) => {
       e.preventDefault();
-      if (!isPlaying)
-        return
+      if (!isPlaying) return;
       const { point, x, y } = JSON.parse(e.target.value);
       const { x: x0, y: y0 } = JSON.parse(
         jQuery(`.${boardObj.boardClass} .empty`).val()
@@ -163,12 +148,36 @@ function TouchTouch() {
       this.checkEndGame();
     };
     // ---------------------
+    // GAME CONTROL
+    this.enableAudio = function (audio) {};
+    this.clickSwitchImage = (e) => {
+      var url = jQuery(e.target).attr("src");
+      urlImage = url;
+      boardObj.updateBoard();
+      this.checkSelectedImage();
+    };
+    this.checkSelectedImage = (e) => {
+      jQuery(`.${subImageClass}`).removeClass("selected");
+      jQuery(`.${subImageClass}`).each(function (e) {
+        if (jQuery(this).attr("src") === urlImage) {
+          jQuery(this).addClass("selected");
+        }
+      });
+    };
+    // ---------------------
+    // GAME EVENT
+    this.restore = () => {
+      jQuery("body").off("click", `.${boardObj.pointClass}`, this.clickSwap);
+      jQuery("body").off("click", `.${startBtnClass}`, this.clickButtonStart);
+      jQuery("body").off("click", `.${subImageClass}`, this.clickSwitchImage);
+    };
+    // ---------------------
     // GAME STATUS
     this.checkEndGame = () => {
       if (_.isEqual(boardObj.boardVal, this.correctBoardVal)) {
         alert("You win!");
         this.handleRestartGame();
-        isPlaying = false
+        isPlaying = false;
       }
     };
     this.isEndGameCannotPlay = (e) => {
@@ -178,18 +187,10 @@ function TouchTouch() {
     this.handleStartGame = (e) => {};
     this.handleRestartGame = (e) => {};
     this.clickButtonStart = () => {
-      isPlaying = true
+      isPlaying = true;
     };
-
-    this.restore = () => {};
-
-    // ---------------------
-    // GAME CONTROL
-    this.enableAudio = function (audio) {};
     // ---------------------
     // AUDIO
-
-    this.initEventTouch = () => {};
   }
 
   return {
@@ -197,7 +198,7 @@ function TouchTouch() {
     initEvent: gameControlObj.initEvent,
   };
 }
-$(document).ready(function ($) {
+jQuery(document).ready(function ($) {
   var game = TouchTouch();
   game.init();
 });

@@ -2,22 +2,32 @@
 <html>
   <head>
     <title></title>
-    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="styles/main.css" />
   </head>
   <body>
-    <div class="game">
+    <div class="game no-select">
       <div class="game__info">
         <img src="image.png" class="game__info--image"/>
         <button class="game__info--start-btn">Start</button>
+        <!-- <button class="game__info--restart-btn">Restart</button> -->
         <br>
         Time:
         <p class="game__info--score">00:00:00</p>
+        <div class="list-sub-image">
+          <img src="images/yasuo.jpg" class="sub-image">
+          <img src="images/yasuo1.jpg" class="sub-image">
+          <img src="images/yone.png" class="sub-image">
+          <img src="images/akali.png" class="sub-image">
+          <img src="images/supergirl.jpg" class="sub-image">
+          <img src="images/quynhnga.jpg" class="sub-image">
+        </div>
       </div>
       <div class="game__control"></div>
     </div>
     <br />
-    <script src="jquery.min.js"></script>
-    <script src="lodash.min.js"></script>
-    <script src="main.js"></script>
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/lodash.min.js"></script>
+    <script src="scripts/helper.js"></script>
+    <script src="scripts/main.js"></script>
   </body>
 </html>

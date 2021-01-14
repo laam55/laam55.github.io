@@ -1,4 +1,11 @@
-.noselect {
+:root {
+  --point-width: 100px;
+  --point-height: 100px;
+  --point-before-top: 100px;
+  --point-before-left: 100px;
+}
+
+.no-select {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -27,14 +34,13 @@
   display: grid;
   grid-template-columns: 33.33333% 33.33333% 33.33333%;
   grid-template-rows: 20% 20% 20% 20% 20%;
-  width: 300px;
   height: 500px;
   position: relative;
   overflow: hidden;
 }
 .game__control .point {
-  width: 100px;
-  height: 100px;
+  width: var(--point-width);
+  height: var(--point-height);
   overflow: hidden;
 }
 .game__control .point:before {
@@ -42,17 +48,33 @@
   width: 100%;
   height: 100%;
   position: absolute;
-  background: url(image.png);
-  background-position: var(--top) var(--left);
-  background-size: cover;
+  background: var(--image-url);
+  background-position: var(--point-before-top) var(--point-before-left);
+  background-size: 100% 100%;
 }
 .game__control .point.empty:after {
   content: "";
   z-index: 1;
-  width: 100px;
-  height: 100px;
+  width: var(--point-width);
+  height: var(--point-height);
   position: absolute;
   background-color: white;
-  background-position: var(--top) var(--left);
-  background-size: cover;
+  background-position: var(--point-before-top) var(--point-before-left);
+  background-size: 100% 100%;
+}
+.list-sub-image {
+  display: grid;
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  row-gap: 10px;
+}
+.sub-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  padding: 2px;
+  border: 1px solid gray;
+  cursor: pointer;
+}
+.sub-image.selected {
+  border: 1px solid red;
 }
