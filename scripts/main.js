@@ -14,8 +14,8 @@ function TouchTouch() {
   var gameControlObj = new GameControl();
   var boardObj = new Board();
   var timerObj = new Timer();
-  var audioClick = document.getElementById("audio_one");
-  var audioEnd = document.getElementById("audio_uplevel");
+  var audioClick = document.getElementById("audio_click");
+  var audioEnd = document.getElementById("audio_end");
 
   function Timer() {
     this.elementClass = "score-label";
