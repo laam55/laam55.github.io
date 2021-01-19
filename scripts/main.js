@@ -2,7 +2,7 @@ function TouchTouch() {
   var startBtnClass = "start-btn";
   var restartBtnClass = "restart-btn";
   var subImageClass = "sub-image";
-  var urlImage = "images/yasuo.jpg";
+  var urlImage = "images/quynhnga.jpg";
   var maxHeight = 500;
   var isPlaying = false;
   const gameConfig = {
