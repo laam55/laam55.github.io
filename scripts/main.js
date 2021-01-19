@@ -2,12 +2,12 @@ function TouchTouch() {
   var startBtnClass = "start-btn";
   var restartBtnClass = "restart-btn";
   var subImageClass = "sub-image";
-  var urlImage = "images/quynhnga.jpg";
+  var urlImage = "images/quynhnga3.jpg";
   var maxHeight = 500;
   var isPlaying = false;
   const gameConfig = {
-    h: 5,
-    v: 6,
+    h: 4,
+    v: 5,
     timeOut: 30,
   };
 
